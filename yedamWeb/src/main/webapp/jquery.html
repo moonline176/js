@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>jquery.html</title>
+    <script src="js/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(() => { 
+            $('#show').html("<b>Hello, World</b>");
+
+            const ulTag = $('<ul />').attr('id','fruit').append(
+                $('<li/>').text('Apple'),
+                $('<li/>').text('Banana'),
+                $('<li/>').text('Cherry')
+            );
+            // $(ulTag).css('background-color','yellow').css('color','red');
+            $(ulTag).css({
+                'background-color':'yellow',
+                'color':'red'
+            })
+            $('#show').append(ulTag);
+
+            $('#delBtn1').on('click',delFunc1);
+            $('#delBtn2').on('click',delFunc2);
+            console.log($('#show').html);
+        });
+
+        //삭제 버튼 클릭시 콜백함수.
+        function delFunc1() {
+            $('#show > ul > li').first().remove();
+        }
+        function delFunc2() {
+            $('#show > ul > li').last().remove();
+        }
+    </script>
+</head>
+<body>
+    <button id="delBtn1">Fdelete</button>
+    <button id="delBtn2">Ldelete</button>
+    <div id="show">
+        <!-- <ul>
+            <li>Apple</li>
+            <li>Banana</li>
+            <li>Cherry</li>
+        </ul> -->
+    </div>
+</body>
+</html>

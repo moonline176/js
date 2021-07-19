@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>comments.html</title>
+<script src="../js/jquery-3.6.0.min.js"></script>
+<script>
+	$(document).ready(function() {
+		loadCommentList();
+	});
+
+	//목록조회..
+	function loadCommentList() {
+		$.ajax({
+			url : "../CommentsServ",
+			data : {
+				cmd : "selectAll"
+			},
+			success : loadCommentResult,
+			error : function() {
+				alert('에러발생');
+			}
+		});
+	}
+	
+	//조회결과..
+	function loadCommentResult(result) {
+		console.log(result);
+		// string -> xml
+		let xmp = new DOMParser();
+		let xmlDoc = xmp.parseFromString(result, 'text/xml');
+		let code = $(xmlDoc).find('code').html();
+		if (code == 'success') {
+			let commentList = eval($(xmlDoc).find('data').html());
+			let listDiv = $('#commentList');
+			for (let i = 0; i < commentList.length; i++) {
+				listDiv.append(makeCommentView(commentList[i]));
+			}
+		}
+	}
+
+	//한건을 출력
+	function makeCommentView(comment) {
+		let div = $('<div />'); //document.createElement('div');
+		$(div).attr('id', comment.id);
+		//div.setAttribute('id', comment.id);
+		$(div).addClass('comment');
+		//div.comment = comment; //{id:1,name:'user1',content:'test'};
+		$(div).data('obj',comment);
+		let str = '<strong>' + comment.name + '</strong>' + comment.content
+				+ '<input type="button" value="수정" onclick="viewUpdateForm('
+				+ comment.id + ')">'
+				+ '<input type="button" value="삭제" onclick="confirmDeletion('
+				+ comment.id + ')">';
+		$(div).html(str); //div.innerHTML = str; // <div><strong>ddd</strong></div>
+		return div;
+	}
+
+	//한건 등록
+	function addComment() {
+		const name = addForm.name.value;
+		if (name == "") {
+			alert("이름 입력");
+			addForm.name.focus();
+			return;
+		}
+		const content = addForm.content.value;
+		if (content == "") {
+			alert("내용 입력");
+			addForm.content.focus();
+			return;
+		}
+
+		$.ajax({
+			url : '../CommentsServ',
+			data : {
+				cmd : "insert",
+				name : name,
+				content : content
+			},
+			success : addResult,
+			error : function() {
+				alert('에러발생');
+			}
+		});
+	}
+
+	//등록 콜백 함수.
+	function addResult(result) {
+		let xmp = new DOMParser();
+		let xmlDoc = xmp.parseFromString(result, 'text/xml');
+		console.log(xmlDoc);
+		let code = $(xmlDoc).find('code').html();
+		let listDiv = $('#commentList'); //document.getElementById('commentList');
+		if (code == "success") {
+			let comment = JSON.parse($(xmlDoc).find('code').html());
+			listDiv.append(makeCommentView(comment)); //jquery에서 사용하는 메소드를 이용, appendChild는 jquery에서 지원하지 않는다.
+			addForm.name.value = '';
+			addForm.content.value = '';
+			alert("등록했습니다. [" + comment.id + "]");
+		} else if (code == "error") {
+			alert("에러발생했습니다.");
+		}
+	}
+
+	//수정화면
+	function viewUpdateForm(commentId) {
+		let commentDiv = $('#'+commentId); //document.getElementById(commentId); //<div></div>
+		let updateFormDiv = $('#commentUpdate'); //document.getElementById('commentUpdate');
+
+		$(commentDiv).after(updateFormDiv); //수정화면에 id기준으로 정보를 보여줌.
+		let comment = $(commentDiv).data('obj'); //comment; // id,name, content 정보호출
+		updateForm.id.value = comment.id;
+		updateForm.name.value = comment.name;
+		updateForm.content.value = comment.content;
+		$(updateFormDiv).css('display','block');//style.display = 'block';
+
+	}
+
+	//ajax 호출 수정
+	function updateComment() {
+		const id = document.updateForm.id.value;
+		const name = document.updateForm.name.value;
+		const content = document.updateForm.content.value;
+		const param = '?cmd=update&id=' + id + '&name=' + name + '&content='
+				+ content;
+		$.ajax({
+			url : "../CommentsServ",
+			data : {
+				cmd : "update",
+				id : id,
+				name : name,
+				content : content
+			},
+			success : updateResult,
+			error : function() {
+				alert('에러발생');
+			}
+		});
+	}
+
+	function updateResult(result) {
+		console.log(result);
+		const xmlDoc = result;
+		const code = xmlDoc.getElementsByTagName('code')[0].firstChild.nodeValue;
+		if (code == 'success') {
+			const comment = JSON
+					.parse(xmlDoc.getElementsByTagName('data')[0].innerHTML);
+			const listDiv = $('#commentList');//document.getElementById('commentList');
+			const commentDiv = makeCommentView(comment);
+			const oldCommentDiv = $('#'+comment.id);//document.getElementById(comment.id);
+			//listDiv.replaceChild(commentDiv, oldCommentDiv);
+			$(oldCommentDiv).replaceWith(commentDiv);
+			$('#commentUpdate').css('display','none');
+			alert('수정완료!');
+		} else {
+			alert('error');
+		}
+	}
+
+	function confirmDeletion(commentId) {
+		const xhtp = new XMLHttpRequest();
+		xhtp.open("get", "../CommentsServ?cmd=delete&id=" + commentId);
+		xhtp.send();
+		xhtp.onreadystatechange = function() {
+		}
+		$.ajax({
+			url : "../CommentsServ",
+			data : {
+				cmd : "delete",
+				id : commentId
+			},
+			success : deleteResult,
+			error : function() {
+				alert('에러발생');
+			}
+		});
+	}
+	//취소버튼
+	function cancelUpdate() {
+		document.getElementById('commentUpdate').style.display = 'none';
+	}
+
+	//삭제 콜백 함수
+	function deleteResult(result) {
+		console.log(result);
+		const xmlDoc = result;
+		const code = $(xmlDoc).find('code').html();
+		if (code == 'success') {
+			const comment = JSON
+					.parse(xmlDoc.getElementsByTagName('data')[0].innerHTML);
+			const listDiv = document.getElementById('commentList');
+			const oldCommentDiv = document.getElementById(comment.id);
+			listDiv.removeChild(oldCommentDiv);
+			alert('삭제완료!');
+		} else {
+			alert('error');
+		}
+	}
+</script>
+</head>
+
+<body>
+	<div id="commentList"></div>
+	<!-- 글등록  -->
+	<div id="commentAdd">
+		<form action="" name="addForm">
+			이름: <input type="text" name="name" size="10"><br> 내용:
+			<textarea name="content" cols="20" rows="2"></textarea>
+			<input type="button" value="등록" onclick="addComment()">
+		</form>
+	</div>
+
+	<!--  글수정  -->
+	<div id='commentUpdate' style='display: none'>
+		<form action="" name="updateForm">
+			<input type="hidden" name="id" value=""> 이름: <input
+				type="text" name="name" size="10"><br> 내용:
+			<textarea name="content" cols="20" rows="2"></textarea>
+			<br> <input type="button" value="변경" onclick="updateComment()">
+			<input type="button" value="취소" onclick="cancelUpdate()">
+		</form>
+	</div>
+	<script>
+		
+	</script>
+</body>
+</html>
