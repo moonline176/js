@@ -114,28 +114,6 @@
 
 	//ajax 호출 수정
 	function updateComment() {
-
-		/* let name = updateForm.name.value;
-		if (name == "") {
-			alert('please...');
-			updateForm.name.focus();
-			return;
-		}
-		let content = updateForm.content.value;
-		if (content == "") {
-			alert('please...');
-			updateForm.content.focus();
-			return;
-		}
-		let id = updateForm.id.value;
-
-		let param = "&name=" + name + "&content=" + content + "&id=" + id;
-
-		let xhtp = new XMLHttpRequest();
-		xhtp.open('get', '../CommentsServ?cmd=update' + param);
-		xhtp.send();
-		xhtp.onreadystatechange = updateResult; */
-
 		const id = document.updateForm.id.value;
 		const name = document.updateForm.name.value;
 		const content = document.updateForm.content.value;
@@ -148,28 +126,7 @@
 	}
 
 	function updateResult() {
-		/* if (this.readyState == 4 && this.status == 200) {
-		       let xmp = new DOMParser();
-		       let xmlDoc = xmp.parseFromString(this.responseText, 'text/xml');
-		       console.log();
-		       let code = xmlDoc.getElementsByTagName('code')[0].innerHTML;
-		       //console.log(xmlDoc.getElementsByTagName('code'));
-		       let listDiv = document.getElementById('commentList');
-		       if (code = 'success') {
-		           let comment = JSON.parse(xmlDoc.getElementsByTagName('data').item(0).innerHTML);
-		           let updateFormDiv = document.getElementById('commentUpdate');
-		           updateFormDiv.style.display = "none";
-		           listDiv.appendChild(updateFormDiv);
-		           for (let i of listDiv.children) {
-		               if (i.id == comment.id) {
-		                   i.innerHTML = makeCommentView(comment);
-		                   break;
-		               }
-		           }
-		       } else if (code = 'error') {
-		           alert("error");
-		       }
-		   } */
+		
 		if (this.readyState == 4) {
 			if (this.status == 200) {
 				console.log(this.responseXML);

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+
+<body>
+	<!--  텍스트 박스  -->
+	<script>
+		let xhtp = new XMLHttpRequest();
+		xhtp.open("get", "members.json");
+		xhtp.send();
+		xhtp.onreadystatechange = function () {
+			if (xhtp.readyState == 4 && xhtp.status == 200) {
+				let data = JSON.parse(xhtp.responseText);
+				let table = document.createElement('table');
+				console.log(data);
+				showEmpList(data);
+			}
+		}
+		
+		let title = ['mem_id', 'first_name', 'last_name', 'email', 'gender','address'];
+	
+		function showEmpList(data) {
+			let table = document.createElement('table');
+			table.setAttribute('border', '1');
+			let cap = document.createElement('caption');
+			cap.appendChild(document.createTextNode('회원리스트'));
+			//헤더 부분 작성
+			table.appendChild(cap);
+			table.appendChild(showTitle());
+			for (let obj of data) {
+				let tr = document.createElement('tr');
+				tr.setAttribute('mem_id', obj.mem_id);
+			    for (let field of title) { // 배열일 경우에는 for..of
+					let td = document.createElement('td');
+					let text = document.createTextNode(obj[field]);
+					td.appendChild(text);
+					tr.appendChild(td);
+				}
+				table.appendChild(tr);
+			}
+			document.body.appendChild(table);
+		}
+		
+		function showTitle(){
+			let tr = document.createElement('tr');
+			for (let t of title){
+				let td = document.createElement('th');
+				let text = document.createTextNode(t);
+				td.appendChild(text);
+				tr.appendChild(td);
+			}
+			return tr;
+		}
+			
+	</script>
+</body>
+</html>

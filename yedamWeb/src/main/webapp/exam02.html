@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>exam02.html</title>
+	<script src="js/jquery-3.6.0.min.js"></script>
+	<script>
+		$(document).ready(onLoadFunc);
+
+		function onLoadFunc() {
+			$.ajax({
+				url: 'employees.xml', //호출 페이지
+				// data: '', //파라미터로 사용할 값.
+				success: successCallBack,
+				error: errorCallBack
+			});
+			console.log($.ajax);
+		}
+
+		function successCallBack(result) {
+
+			const list = $('#show');
+			const record = $(result).find('record');
+			for (let row of record) {
+				const ulTag = $('<ul />');
+				for (let l of row.children) {
+					let liTag = $('<li />')
+					liTag.html(l.innerHTML);
+					ulTag.append(liTag);
+				}
+				list.append(ulTag);
+			}
+		}
+		function errorCallBack(reject) {
+		}
+	</script>
+</head>
+
+<body>
+	<div id="show"></div>
+</body>
+
+</html>

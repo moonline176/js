@@ -27,8 +27,9 @@
 	function loadCommentResult(result) {
 		console.log(result);
 		// string -> xml
-		let xmp = new DOMParser();
+		let xmp = new DOMParser(); // XML 문서 parse
 		let xmlDoc = xmp.parseFromString(result, 'text/xml');
+		//parseFromString: 문자열 parse
 		let code = $(xmlDoc).find('code').html();
 		if (code == 'success') {
 			let commentList = eval($(xmlDoc).find('data').html());
@@ -42,9 +43,9 @@
 	//한건을 출력
 	function makeCommentView(comment) {
 		let div = $('<div />'); //document.createElement('div');
-		$(div).attr('id', comment.id);
+		$(div).attr('id', comment.id); //attr:선택한 요소에 속성값을 추가
 		//div.setAttribute('id', comment.id);
-		$(div).addClass('comment');
+		$(div).addClass('comment'); // 클래스 추가
 		//div.comment = comment; //{id:1,name:'user1',content:'test'};
 		$(div).data('obj',comment);
 		let str = '<strong>' + comment.name + '</strong>' + comment.content
